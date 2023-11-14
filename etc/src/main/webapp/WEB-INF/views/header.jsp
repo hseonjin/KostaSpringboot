@@ -7,7 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    String data = (String) request.getAttribute("data");
+    String data = (String) request.getAttribute("data1");
 %>
 <html>
 <head>

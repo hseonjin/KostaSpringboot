@@ -18,5 +18,4 @@ public class TestController {
         return "response_test";
     }
     // response_test // forward 방식으로 주는 것이다
-
 }

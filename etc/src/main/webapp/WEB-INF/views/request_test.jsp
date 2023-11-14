@@ -12,7 +12,8 @@
 </head>
 <body>
 <form action="request_test" method="post">
-  <input type="text" name = "data"/>
+  <input type="text" name = "data1"/>
+  <input type="text" name = "data2"/>
   <input type="submit" value="전송"/>
 </form>
 </body>
