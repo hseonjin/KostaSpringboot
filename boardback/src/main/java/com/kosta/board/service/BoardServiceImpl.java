@@ -57,7 +57,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public void boardWrite(Board board, MultipartFile file) throws Exception {
+    public Integer boardWrite(Board board, MultipartFile file) throws Exception {
         if(file!=null && !file.isEmpty()) {
             String dir = "D:/seonjin/upload/";
             FileVO fileVO = new FileVO();
@@ -75,6 +75,7 @@ public class BoardServiceImpl implements BoardService {
             board.setFileurl(fileVO.getNum()+"");
         }
         boardDAO.insertBoard(board);
+        return board.getNum();
     }
 
     @Override

@@ -4,8 +4,15 @@ public class PageInfo {
 	private Integer allPage;
 	private Integer curPage;
 	private Integer startPage;
-	private Integer endPage;	
-	
+	private Integer endPage;
+
+	public PageInfo(){}
+
+	public PageInfo(Integer curPage) {
+		super();
+		this.curPage = curPage;
+	}
+
 	public Integer getAllPage() {
 		return allPage;
 	}
