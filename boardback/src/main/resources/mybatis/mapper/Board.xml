@@ -31,12 +31,10 @@
 	</select>
 	<!-- 게시글 수정 -->
 	<update id="updateBoard" parameterType="Board">
-		update board
-		<trim prefix="SET" suffixOverrides=",">
-			<if test="subject != null">subject=#{subject},</if>
-			<if test="content != null">content=#{content},</if>
-			<if test="fileurl != null">fileurl=#{fileurl},</if>
-		</trim>
+		update board set
+			subject=#{subject},
+			content=#{content},
+			fileurl=#{fileurl}
 		where num = #{num}
 	</update>
 	<!-- 게시글 삭제 -->

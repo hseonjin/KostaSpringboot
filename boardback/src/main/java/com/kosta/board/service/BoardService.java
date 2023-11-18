@@ -15,10 +15,13 @@ public interface BoardService {
 
     void readImage(Integer num, OutputStream out) throws Exception;
 
-    Integer boardWrite(Board board, MultipartFile file) throws Exception;
+    Integer boardWrite(Board board, List<MultipartFile> file) throws Exception;
 
-    Board boardModify(Board board, MultipartFile file) throws Exception;
+    Integer boardModify(Board board, List<MultipartFile> file) throws Exception;
     void boardDelete(Integer num) throws Exception;
     List<Board> searchListByPage(String type, String keyword, PageInfo pageInfo) throws Exception;
+    Boolean isHeartBoard(String id, Integer num) throws Exception;
+    void selHeartBoard(String id, Integer num) throws Exception;
+    void delHeartBoard(String id, Integer num) throws Exception;
 
 }

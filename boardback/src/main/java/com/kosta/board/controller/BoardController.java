@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
@@ -37,10 +38,17 @@ public class BoardController {
 
     // 상세보기
     @GetMapping("boarddetail/{num}")
-    public ResponseEntity<Board> boardDetail(@PathVariable Integer num) {
+    public ResponseEntity<Object> boardDetail(@PathVariable Integer num) {
         try {
             Board board = service.boardDetail(num);
-            return new ResponseEntity<>(board, HttpStatus.OK);
+            Boolean heart = service.isHeartBoard(null, num);
+
+            Map<String, Object> res = new HashMap<>();
+            res.put("board", board);
+            // res.put("heart", heart);
+            res.put("heart", true);
+
+            return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -99,7 +107,8 @@ public class BoardController {
 
     // 게시글 작성
     @PostMapping("boardwrite")
-    public ResponseEntity<Integer> boardWrite(@ModelAttribute Board board, MultipartFile file) {
+    public ResponseEntity<Integer> boardWrite(@ModelAttribute Board board, List<MultipartFile> file) {
+        System.out.println(file.size());
         try {
             Integer num = service.boardWrite(board, file);
             return new ResponseEntity<>(num, HttpStatus.OK);
@@ -109,4 +118,16 @@ public class BoardController {
         }
     }
 
+    @PostMapping("boardmodify") // 게시글 수정 페이지 POST
+    public ResponseEntity<Integer> boardModify(@ModelAttribute Board board, @RequestParam(value="file", required = false) List<MultipartFile> file) {
+        try {
+            Integer num = service.boardModify(board, file);
+            return new ResponseEntity<>(num, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+    }
+
+    // 좋아요 ------------------------------------
 }

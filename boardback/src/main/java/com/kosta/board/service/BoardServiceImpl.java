@@ -1,6 +1,7 @@
 package com.kosta.board.service;
 
 import com.kosta.board.dao.BoardDAO;
+import com.kosta.board.dao.BoardLikeDAO;
 import com.kosta.board.dto.Board;
 import com.kosta.board.dto.FileVO;
 import com.kosta.board.util.PageInfo;
@@ -20,6 +21,8 @@ import java.util.Map;
 public class BoardServiceImpl implements BoardService {
     @Autowired
     private BoardDAO boardDAO;
+    @Autowired
+    private BoardLikeDAO boardLikeDAO;
 
     @Override
     public List<Board> boardListByPage(PageInfo pageInfo) throws Exception {
@@ -57,73 +60,87 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Integer boardWrite(Board board, MultipartFile file) throws Exception {
-        if(file!=null && !file.isEmpty()) {
-            String dir = "D:/seonjin/upload/";
-            FileVO fileVO = new FileVO();
-            fileVO.setDirectory(dir);
-            fileVO.setName(file.getOriginalFilename());
-            fileVO.setSize(file.getSize());
-            fileVO.setContenttype(file.getContentType());
-            fileVO.setData(file.getBytes());
-            boardDAO.insertFile(fileVO);
+    public Integer boardWrite(Board board, List<MultipartFile> files) throws Exception {
+        String dir = "D:/seonjin/upload/";
+        if(files!=null && files.size()!=0) {
+            String fileNums = "";
+            for(MultipartFile file : files) {
+                // file 테이블에 insert
+                FileVO fileVO = new FileVO();
+                fileVO.setDirectory(dir);
+                fileVO.setName(file.getOriginalFilename());
+                fileVO.setSize(file.getSize());
+                fileVO.setContenttype(file.getContentType());
+                fileVO.setData(file.getBytes());
+                boardDAO.insertFile(fileVO);
 
-            Integer num = fileVO.getNum();
-
-            File uploadFile = new File(dir+fileVO.getNum());
-            file.transferTo(uploadFile);
-            board.setFileurl(fileVO.getNum()+"");
+                // upload 폴더에 업로드
+                File uploadFile = new File(dir+fileVO.getNum());
+                file.transferTo(uploadFile);
+                // file 번호 목록 만들기
+                if(!fileNums.equals(""))
+                    fileNums += ",";
+                fileNums += fileVO.getNum();
+            }
+            board.setFileurl(fileNums); // 1,2,3
         }
         boardDAO.insertBoard(board);
         return board.getNum();
     }
 
     @Override
-    public Board boardModify(Board board, MultipartFile file) throws Exception { // 생성 때와 유사한 로직
-        // file이 존재할 때
-        if(file!=null && !file.isEmpty()) {
-            // 1. 파일정보 DB에 추가
+    public Integer boardModify(Board board, List<MultipartFile> fileList) throws Exception { // 생성 때와 유사한 로직
+        if(fileList!=null && fileList.size()!=0) {
             String dir = "D:/seonjin/upload/";
-            FileVO fileVO = new FileVO();
-            fileVO.setDirectory(dir);
-            fileVO.setName(file.getOriginalFilename());
-            fileVO.setSize(file.getSize());
-            fileVO.setContenttype(file.getContentType());
-            fileVO.setData(file.getBytes());
-            boardDAO.insertFile(fileVO);
+            String fileNums = "";
+            for(MultipartFile file : fileList) {
+                if (file.isEmpty()) {
+                    fileNums += (fileNums.equals("") ? "" : ",")+file.getOriginalFilename();
+                } else {
+                    // file 테이블에 insert
+                    FileVO fileVO = new FileVO();
+                    fileVO.setDirectory(dir);
+                    fileVO.setName(file.getOriginalFilename());
+                    fileVO.setSize(file.getSize());
+                    fileVO.setContenttype(file.getContentType());
+                    fileVO.setData(file.getBytes());
+                    boardDAO.insertFile(fileVO);
 
-            // 2. upload 폴더에 파일 업로드
-            File uploadFile = new File(dir+fileVO.getNum());
-            file.transferTo(uploadFile);
-
-            // 3. 기존 파일번호 삭제를 위해 받아놓기
-            Integer deleteFileNum = null;
-            if(board.getFileurl()!=null && board.getFileurl().trim().equals("")) {
-                deleteFileNum = Integer.parseInt(board.getFileurl());
+                    // upload 폴더에 업로드
+                    File uploadFile = new File(dir + fileVO.getNum());
+                    file.transferTo(uploadFile);
+                    fileNums += (fileNums.equals("") ? "" : ",") + fileVO.getNum();
+                }
             }
-            board.setFileurl(fileVO.getNum()+"");
-
-            // 4. 파일번호를 board fileUrl에 복사 & board update
-            boardDAO.updateBoard(board);
-
-            // 5. board fileUrl에 해당하는 파일 번호를 파일 테이블에서 삭제
-            if(deleteFileNum!=null) {
-                boardDAO.deleteFile(deleteFileNum);
-            }
+            board.setFileurl(fileNums); // 1,2,3
         } else {
-            boardDAO.updateBoard(board);
+            board.setFileurl(null);
         }
-        return boardDAO.selectBoard(board.getNum());
+        boardDAO.updateBoard(board);
+        return board.getNum();
+    }
+
+    private void fileDelete(Integer num) throws Exception {
+        Board board = boardDAO.selectBoard(num);
+        if(board==null) throw new Exception("글 번호 오류");
+        String fileUrl = board.getFileurl();
+
+        if(fileUrl!=null && !fileUrl.equals("")) { // 파일이 있는 경우 파일 먼저 삭제
+            String[] fileList = fileUrl.split(",");
+            for (String fileNum : fileList) {
+                boardDAO.deleteFile(Integer.valueOf(fileNum));
+                String dir = "d:/seonjin/upload/";
+                File file = new File(dir + fileNum);
+                if (file.exists()) {
+                    file.delete();
+                }
+            }
+        }
     }
 
     public void boardDelete(Integer num) throws Exception {
-        Board board = boardDAO.selectBoard(num);
-        if(board != null) {
-            if(board.getFileurl()!=null && !board.getFileurl().equals("")) { // 파일이 있는 경우 파일 먼저 삭제
-                boardDAO.deleteFile(Integer.parseInt(board.getFileurl()));
-            }
+        fileDelete(num);
         boardDAO.deleteBoard(num);
-        }
     }
     @Override
     public List<Board> searchListByPage(String type, String keyword, PageInfo pageInfo) throws Exception {
@@ -143,6 +160,22 @@ public class BoardServiceImpl implements BoardService {
         int row = (pageInfo.getCurPage()-1)*10+1;
 
         return boardDAO.searchBoardList(type, keyword, row-1);
+    }
+
+    @Override
+    public Boolean isHeartBoard(String id, Integer num) throws Exception {
+        Integer heartNum = boardLikeDAO.selectBoardLike(id, num);
+        return heartNum == null ? false :true;
+    }
+
+    @Override
+    public void selHeartBoard(String id, Integer num) throws Exception {
+        boardLikeDAO.insertBoardLike(id, num);
+    }
+
+    @Override
+    public void delHeartBoard(String id, Integer num) throws Exception {
+        boardLikeDAO.deleteBoardLike(id, num);
     }
 }
 
