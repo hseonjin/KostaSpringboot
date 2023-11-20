@@ -13,11 +13,11 @@ const ModifyForm = () => {
     let selectImg = null;
 
     useEffect(()=>{
-        axios.get(`http://localhost:8088/boarddetail/${num}`)
+        axios.get(`http://localhost:8088/boardmodify/${num}`)
             .then(res=> {
                 console.log(res.data);
-                setBoard(res.data.board);
-                let fileurl = res.data.board.fileurl; // 1,2,3
+                setBoard(res.data);
+                let fileurl = res.data.fileurl; // 1,2,3
                 let filenums = fileurl.split(','); // [1,2,3]
                 let filearr = []; //[{type:'i', data:1}, {}, {}]
                 for(let filenum of filenums) {
@@ -28,7 +28,7 @@ const ModifyForm = () => {
             .catch(err=>{
                 console.log(err);
             })
-    }, [])
+    }, [num])
 
     const change = (e) => {
         const name = e.target.name;
@@ -149,7 +149,7 @@ const ModifyForm = () => {
                     <tr>
                         <td></td>
                         <td>
-                            <Button color='primary' onClick={submit}>등록</Button>&nbsp;&nbsp;
+                            <Button color='primary' onClick={submit}>수정</Button>&nbsp;&nbsp;
                         </td>
                     </tr>
                     </tbody>

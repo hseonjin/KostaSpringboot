@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -23,5 +25,11 @@ class MemberRepositoryTest {
         for(Board board : member.getBoardList()) {
             System.out.println(board);
         }
+    }
+
+    @Test
+    void selectMemberByEmail() {
+        Optional<Member> member = repository.findByEmail("seonjin0524@naver.com");
+        System.out.println(member.get());
     }
 }

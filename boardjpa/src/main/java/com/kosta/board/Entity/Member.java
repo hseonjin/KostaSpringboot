@@ -1,9 +1,7 @@
 package com.kosta.board.Entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.kosta.board.dto.MemberDTO;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,6 +12,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Member {
     @Id
     private String id;
@@ -33,4 +32,15 @@ public class Member {
     public String toString() {
         return String.format("[%s,%s,%s,%s,%s]", id,name,password,email,address);
     }
+
+    public MemberDTO toDTO() {
+        return MemberDTO.builder()
+                .id(id)
+                .name(name)
+                .password(password)
+                .email(email)
+                .address(address)
+                .build();
+    }
+
 }

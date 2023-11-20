@@ -1,6 +1,7 @@
 package com.kosta.board.repository;
 
 import com.kosta.board.Entity.Board;
+import com.kosta.board.Entity.Member;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
