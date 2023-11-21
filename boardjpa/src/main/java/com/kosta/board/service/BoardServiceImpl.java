@@ -1,8 +1,11 @@
 package com.kosta.board.service;
 
 import com.kosta.board.Entity.Board;
+import com.kosta.board.Entity.Boardlike;
+import com.kosta.board.Entity.Member;
 import com.kosta.board.dto.BoardDTO;
 import com.kosta.board.Entity.FileVO;
+import com.kosta.board.repository.BoardlikeRepository;
 import com.kosta.board.repository.BoardRepository;
 import com.kosta.board.repository.FileVORepository;
 import com.kosta.board.util.PageInfo;
@@ -27,6 +30,10 @@ public class BoardServiceImpl implements BoardService {
     private BoardRepository boardRepository;
     @Autowired
     private FileVORepository fileVORepository;
+    @Autowired
+    private BoardlikeRepository boardlikeRepository;
+
+
     @Override
     public List<BoardDTO> boardListByPage(PageInfo pageInfo) throws Exception {
         PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10, Sort.by(Sort.Direction.DESC, "num"));
@@ -164,7 +171,7 @@ public class BoardServiceImpl implements BoardService {
         } else if(type.equals("content")) {
             pages = boardRepository.findByContentContains(keyword, pageRequest);
         } else if (type.equals("writer")) {
-//            pages = boardRepository.findByWriterContains(keyword, pageRequest);
+            pages = boardRepository.findByMember_Id(keyword, pageRequest);
         } else {
             return null;
         }
@@ -182,12 +189,31 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Boolean isHeartBoard(String id, Integer num) throws Exception {
-        return null;
+        Optional<Boardlike> boardlike = boardlikeRepository.findByMember_idAndBoard_num(id, num);
+        if(boardlike.isPresent()) return true;
+        return false;
     }
 
     @Override
-    public void selHeartBoard(String id, Integer num) throws Exception {
-
+    public Boolean selHeartBoard(String id, Integer num) throws Exception {
+        Optional<Boardlike> boardlike = boardlikeRepository.findByMember_idAndBoard_num(id, num);
+        Board board = boardRepository.findById(num).get();
+        Boolean isSelect;
+        if(boardlike.isPresent()) { // true일 경우(이미 선택된 경우) 삭제
+            boardlikeRepository.deleteById(boardlike.get().getNum());
+            board.setLikecount(board.getLikecount()-1);
+            isSelect = false;
+        } else { // false일 경우 추가
+            Boardlike nboardlike = Boardlike.builder()
+                    .member(Member.builder().id(id).build())
+                    .board(Board.builder().num(num).build())
+                    .build();
+            boardlikeRepository.save(nboardlike);
+            board.setLikecount(board.getLikecount()+1);
+            isSelect = true;
+        }
+        boardRepository.save(board);
+        return isSelect;
     }
 
     @Override

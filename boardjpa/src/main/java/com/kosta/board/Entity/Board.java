@@ -9,6 +9,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -40,6 +42,10 @@ public class Board {
     @ManyToOne(fetch = FetchType.EAGER) // 다대일 관계, Eager 패치 방식
     @JoinColumn(name="writer")
     private Member member;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "board", fetch = FetchType.EAGER)
+    private List<Boardlike> boardLike = new ArrayList<>();
 
     @Override
     public String toString() {

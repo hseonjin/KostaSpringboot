@@ -45,7 +45,7 @@ public class BoardController {
 
             Map<String, Object> res = new HashMap<>();
             res.put("board", board);
-            // res.put("heart", heart);
+//            res.put("heart", heart);
             res.put("heart", true);
 
             return new ResponseEntity<>(res, HttpStatus.OK);
@@ -134,6 +134,21 @@ public class BoardController {
         try {
             BoardDTO board = service.boardDetail(num);
             return new ResponseEntity<>(board, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("likeboard")
+    public ResponseEntity<Map<String, Object>> boardLike(@PathVariable Integer num) {
+        try {
+            Map<String, Object> res = new HashMap<>();
+            Boolean selectBoard = service.selHeartBoard("kkomee", num);
+            res.put("isSelect", selectBoard);
+            Integer likeCount = service.boardDetail(num).getLikecount();
+            res.put("likeCount", likeCount);
+            return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

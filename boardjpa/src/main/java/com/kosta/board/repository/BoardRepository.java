@@ -11,5 +11,5 @@ public interface BoardRepository extends JpaRepository<Board, Integer> {
 //    List<Board> findByWriter(String writer);
     Page<Board> findBySubjectContains(String subject, PageRequest pageRequest);
     Page<Board> findByContentContains(String content, PageRequest pageRequest);
-//    Page<Board> findByWriterContains(String writer, PageRequest pageRequest);
+    Page<Board> findByMember_Id(String writer, PageRequest pageRequest);
 }

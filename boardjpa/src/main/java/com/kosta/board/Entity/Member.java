@@ -25,8 +25,12 @@ public class Member {
     @Column
     private String address;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Board> boardList = new ArrayList<>();
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Boardlike> boardLike = new ArrayList<>();
 
     @Override
     public String toString() {

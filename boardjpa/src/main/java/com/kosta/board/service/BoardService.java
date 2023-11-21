@@ -20,7 +20,7 @@ public interface BoardService {
     void boardDelete(Integer num) throws Exception;
     List<BoardDTO> searchListByPage(String type, String keyword, PageInfo pageInfo) throws Exception;
     Boolean isHeartBoard(String id, Integer num) throws Exception;
-    void selHeartBoard(String id, Integer num) throws Exception;
+    Boolean selHeartBoard(String id, Integer num) throws Exception;
     void delHeartBoard(String id, Integer num) throws Exception;
     void plusViewCount(Integer num) throws Exception;
 }
