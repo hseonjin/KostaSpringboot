@@ -2,17 +2,18 @@ package com.kosta.univ.entity;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.lang.reflect.Member;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-//@Data // @Getter, @Setter, @ToString, @RequiredArgsConstructor 포함
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"studList1", "studList2", "profList"})
 public class Department {
     @Id
     private Integer deptno;
@@ -22,9 +23,10 @@ public class Department {
     private Integer part;
     @Column
     private String build;
-
-    @Override
-    public String toString() {
-        return String.format("[%d,%s,%d,%s]", deptno,dname, part, build);
-    }
+    @OneToMany(mappedBy = "dept1", fetch = FetchType.LAZY)
+    private List<Student> studList1= new ArrayList<>();
+    @OneToMany(mappedBy = "dept2", fetch = FetchType.LAZY)
+    private List<Student> studList2= new ArrayList<>();
+    @OneToMany(mappedBy = "dept", fetch = FetchType.LAZY)
+    private List<Professor> profList = new ArrayList<>();
 }

@@ -3,7 +3,6 @@ package com.kosta.univ.service;
 import com.kosta.univ.entity.Department;
 import com.kosta.univ.entity.Professor;
 import com.kosta.univ.entity.Student;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -20,7 +19,7 @@ public interface UnivService {
     List<Student> studentListByProfName(String profName) throws Exception; //교수이름으로 담당 학생목록 조회
 
     Professor professorByProfNo(Integer profNo) throws Exception; //교수번호로 교수 조회
-    List<Professor> professorListByProfName(String profName) throws Exception; //교수이름으로 교수 목록 조회
+    List<Professor> professorByProfName(String profName) throws Exception; //교수이름으로 교수 목록 조회
     List<Professor> professorListByDeptNo(Integer deptNo) throws Exception; //학과번호로 교수목록 조회
     List<Professor> professorListByDeptName(String deptName) throws Exception; //학과이름로 교수목록 조회
     List<Professor> professorListByPosition(String position) throws Exception; //직급으로 교수목록 조회

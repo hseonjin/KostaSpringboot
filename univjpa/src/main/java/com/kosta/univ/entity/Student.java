@@ -11,6 +11,7 @@ import java.sql.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"dept1", "dept2", "prof"})
 public class Student {
     @Id
     private Integer studno;
@@ -30,12 +31,16 @@ public class Student {
     private Integer height;
     @Column
     private Integer weight;
-    @Column
-    private Integer deptno1;
-    @Column
-    private Integer deptno2;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="profno")
+    @JoinColumn(name = "deptno1") // student 테이블의 deptno1과 매핑
+    private Department dept1;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "deptno2")
+    private Department dept2;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "profno")
     private Professor prof;
 }

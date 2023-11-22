@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"studList", "dept"})
 public class Professor {
     @Id
     private Integer profno;
@@ -29,18 +30,12 @@ public class Professor {
     @Column
     private Integer bonus;
     @Column
-    private Integer deptno;
-    @Column
     private String email;
     @Column
     private String hpage;
-
     @OneToMany(mappedBy = "prof", fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<Student> studentList = new ArrayList<>();
-
-//    @Override
-//    public String toString() {
-//        return String.format("[%d,%s,%s,%s,%d,]", deptno,dname, part, build);
-//    }
+    private List<Student> studList = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "deptno")
+    private Department dept;
 }
